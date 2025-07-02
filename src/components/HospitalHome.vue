@@ -62,29 +62,20 @@
               </el-menu-item>
             </el-tooltip>
 
+            <el-tooltip content="药品库存管理" placement="right" effect="light">
+              <el-menu-item index="4" @click="showDrugManagement">
+                <el-icon><Box /></el-icon>
+                <template #title>
+                  <span>药品管理</span>
+                </template>
+              </el-menu-item>
+            </el-tooltip>
+
             <el-tooltip content="处方记录管理" placement="right" effect="light">
               <el-menu-item index="5" @click="showPrescriptionManagement">
                 <el-icon><Document /></el-icon>
                 <template #title>
                   <span>处方管理</span>
-                </template>
-              </el-menu-item>
-            </el-tooltip>
-
-            <el-tooltip content="科室管理" placement="right" effect="light">
-              <el-menu-item index="6" @click="showDepartmentManagement">
-                <el-icon><OfficeBuilding /></el-icon>
-                <template #title>
-                  <span>科室管理</span>
-                </template>
-              </el-menu-item>
-            </el-tooltip>
-
-            <el-tooltip content="医生管理" placement="right" effect="light">
-              <el-menu-item index="7" @click="showDoctorManagement">
-                <el-icon><User /></el-icon>
-                <template #title>
-                  <span>医生管理</span>
                 </template>
               </el-menu-item>
             </el-tooltip>
@@ -105,24 +96,6 @@
                 <el-icon><Box /></el-icon>
                 <template #title>
                   <span>药品管理</span>
-                </template>
-              </el-menu-item>
-            </el-tooltip>
-
-            <el-tooltip content="科室管理" placement="right" effect="light">
-              <el-menu-item index="6" @click="showDepartmentManagement">
-                <el-icon><OfficeBuilding /></el-icon>
-                <template #title>
-                  <span>科室管理</span>
-                </template>
-              </el-menu-item>
-            </el-tooltip>
-
-            <el-tooltip content="医生管理" placement="right" effect="light">
-              <el-menu-item index="7" @click="showDoctorManagement">
-                <el-icon><User /></el-icon>
-                <template #title>
-                  <span>医生管理</span>
                 </template>
               </el-menu-item>
             </el-tooltip>
@@ -298,8 +271,90 @@
               </div>
             </div>
 
+            <!-- 药品管理页面 -->
+            <div v-if="currentMenu === '4'" class="drug-management">
+              <div class="page-header">
+                <h2 class="page-title">药品管理</h2>
+                <div class="header-actions">
+                  <el-button type="success" @click="showDrugInboundDialog">
+                    <el-icon><Plus /></el-icon>药品入库
+                  </el-button>
+                  <el-button type="warning" @click="showDrugOutboundDialog">
+                    <el-icon><Minus /></el-icon>药品出库
+                  </el-button>
+                  <el-button type="primary" @click="showAddDrugDialog">
+                    <el-icon><Plus /></el-icon>新增药品
+                  </el-button>
+                </div>
+              </div>
+              
+              <!-- 搜索栏 -->
+              <div class="search-bar">
+                <el-input
+                  v-model="drugSearchKeyword"
+                  placeholder="请输入药品名称或批次号搜索"
+                  style="width: 300px"
+                  clearable
+                  @keyup.enter="handleDrugSearch"
+                >
+                  <template #prefix>
+                    <el-icon><Search /></el-icon>
+                  </template>
+                </el-input>
+                <el-button type="primary" @click="handleDrugSearch">搜索</el-button>
+                <el-button @click="resetDrugSearch">重置</el-button>
+              </div>
+              
+              <!-- 药品列表 -->
+              <el-table
+                :data="drugList"
+                v-loading="drugLoading"
+                style="width: 100%"
+                @selection-change="handleDrugSelectionChange"
+              >
+                <el-table-column type="selection" width="55" />
+                <el-table-column prop="batchNumber" label="批次号" width="150" />
+                <el-table-column prop="drugName" label="药品名称" width="150" />
+                <el-table-column prop="category" label="类别" width="100" />
+                <el-table-column prop="specification" label="规格" width="120" />
+                <el-table-column prop="manufacturer" label="生产厂家" width="150" />
+                <el-table-column prop="expiryDate" label="有效期" width="120" />
+                <el-table-column prop="unitPrice" label="单价" width="100">
+                  <template #default="scope">
+                    ¥{{ scope.row.unitPrice }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="stockQuantity" label="库存" width="100">
+                  <template #default="scope">
+                    <span :class="{ 'low-stock': scope.row.stockQuantity < 10 }">
+                      {{ scope.row.stockQuantity }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" width="200" fixed="right">
+                  <template #default="scope">
+                    <el-button size="small" @click="handleDrugEdit(scope.row)">编辑</el-button>
+                    <el-button size="small" type="danger" @click="handleDrugDelete(scope.row)">删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              
+              <!-- 分页 -->
+              <div class="pagination-wrapper">
+                <el-pagination
+                  v-model:current-page="drugPagination.current"
+                  v-model:page-size="drugPagination.size"
+                  :page-sizes="[10, 20, 50, 100]"
+                  :total="drugPagination.total"
+                  layout="total, sizes, prev, pager, next, jumper"
+                  @size-change="handleDrugSizeChange"
+                  @current-change="handleDrugCurrentChange"
+                />
+              </div>
+            </div>
+
             <!-- 其他功能占位内容 -->
-            <div v-else class="placeholder-content">
+            <div v-else-if="currentMenu !== '6' && currentMenu !== '7'" class="placeholder-content">
               <el-empty 
                 :description="`${getMenuTitle(currentMenu)}功能开发中...`"
                 :image-size="150"
@@ -431,6 +486,179 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 药品管理弹窗 -->
+    <el-dialog
+      v-model="drugDialogVisible"
+      :title="isDrugEdit ? '编辑药品' : '新增药品'"
+      width="600px"
+      @close="() => drugFormRef?.resetFields()"
+    >
+      <el-form
+        ref="drugFormRef"
+        :model="drugForm"
+        :rules="drugRules"
+        label-width="100px"
+      >
+        <el-form-item label="批次号" prop="batchNumber">
+          <el-input v-model="drugForm.batchNumber" placeholder="请输入批次号" />
+        </el-form-item>
+        <el-form-item label="药品名称" prop="drugName">
+          <el-input v-model="drugForm.drugName" placeholder="请输入药品名称" />
+        </el-form-item>
+        <el-form-item label="类别" prop="category">
+          <el-input v-model="drugForm.category" placeholder="请输入类别" />
+        </el-form-item>
+        <el-form-item label="规格" prop="specification">
+          <el-input v-model="drugForm.specification" placeholder="请输入规格" />
+        </el-form-item>
+        <el-form-item label="生产厂家" prop="manufacturer">
+          <el-input v-model="drugForm.manufacturer" placeholder="请输入生产厂家" />
+        </el-form-item>
+        <el-form-item label="有效期" prop="expiryDate">
+          <el-date-picker
+            v-model="drugForm.expiryDate"
+            type="date"
+            placeholder="选择有效期"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="单价" prop="unitPrice">
+          <el-input-number
+            v-model="drugForm.unitPrice"
+            :min="0"
+            :precision="2"
+            placeholder="请输入单价"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="库存" prop="stockQuantity">
+          <el-input-number
+            v-model="drugForm.stockQuantity"
+            :min="0"
+            placeholder="请输入库存"
+            style="width: 100%"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="drugDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitDrugForm">
+            {{ isDrugEdit ? '更新' : '创建' }}
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 药品入库弹窗 -->
+    <el-dialog
+      v-model="drugInboundDialogVisible"
+      title="药品入库"
+      width="500px"
+    >
+      <el-form
+        ref="drugInboundFormRef"
+        :model="drugInboundForm"
+        :rules="drugInboundRules"
+        label-width="100px"
+      >
+        <el-form-item label="药品名称" prop="drugName">
+          <el-input v-model="drugInboundForm.drugName" placeholder="请输入药品名称" />
+        </el-form-item>
+        <el-form-item label="数量" prop="quantity">
+          <el-input-number
+            v-model="drugInboundForm.quantity"
+            :min="1"
+            placeholder="请输入数量"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="类别" prop="category">
+          <el-input v-model="drugInboundForm.category" placeholder="请输入类别" />
+        </el-form-item>
+        <el-form-item label="单价" prop="unitPrice">
+          <el-input-number
+            v-model="drugInboundForm.unitPrice"
+            :min="0"
+            :precision="2"
+            placeholder="请输入单价"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="规格" prop="specification">
+          <el-input v-model="drugInboundForm.specification" placeholder="请输入规格" />
+        </el-form-item>
+        <el-form-item label="生产厂家" prop="manufacturer">
+          <el-input v-model="drugInboundForm.manufacturer" placeholder="请输入生产厂家" />
+        </el-form-item>
+        <el-form-item label="有效期" prop="expiry_date">
+          <el-date-picker
+            v-model="drugInboundForm.expiry_date"
+            type="datetime"
+            placeholder="选择有效期"
+            style="width: 100%"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="drugInboundDialogVisible = false">取消</el-button>
+          <el-button type="success" @click="submitDrugInbound">入库</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 药品出库弹窗 -->
+    <el-dialog
+      v-model="drugOutboundDialogVisible"
+      title="药品出库"
+      width="500px"
+    >
+      <el-form
+        ref="drugOutboundFormRef"
+        :model="drugOutboundForm"
+        :rules="drugOutboundRules"
+        label-width="100px"
+      >
+        <el-form-item label="选择药品" prop="drugBatchId">
+          <el-select
+            v-model="drugOutboundForm.drugBatchId"
+            placeholder="请选择药品批次"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="drug in drugList"
+              :key="drug.id"
+              :label="`${drug.drugName} - ${drug.batchNumber} (库存: ${drug.stockQuantity})`"
+              :value="drug.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="出库数量" prop="quantity">
+          <el-input-number
+            v-model="drugOutboundForm.quantity"
+            :min="1"
+            placeholder="请输入出库数量"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="出库原因" prop="outboundReason">
+          <el-select v-model="drugOutboundForm.outboundReason" placeholder="请选择出库原因" style="width: 100%">
+            <el-option label="处方用药" value="PRESCRIPTION" />
+            <el-option label="损耗" value="DAMAGE" />
+            <el-option label="过期" value="EXPIRED" />
+            <el-option label="其他" value="OTHER" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="drugOutboundDialogVisible = false">取消</el-button>
+          <el-button type="warning" @click="submitDrugOutbound">出库</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -451,6 +679,7 @@ import {
   OfficeBuilding,
   Plus,
   Search,
+  Minus,
 } from '@element-plus/icons-vue'
 import { useUserStore } from '../stores/user'
 import {
@@ -458,14 +687,20 @@ import {
   createDepartment,
   updateDepartment,
   deleteDepartment,
-  checkDepartmentCode
+  checkDepartmentCode,
+  getDrugBatches,
+  createDrugBatch,
+  updateDrugBatch,
+  deleteDrugBatch,
+  drugInbound,
+  drugOutbound
 } from '../service/api'
 
 const router = useRouter()
 const userStore = useUserStore()
 
 // 响应式数据
-const currentMenu = ref('6') // 默认显示科室管理
+const currentMenu = ref('4') // 默认显示药品管理
 
 // 科室管理相关数据
 const loading = ref(false)
@@ -589,6 +824,7 @@ const showHR = () => {
 
 const showDrugManagement = () => {
   currentMenu.value = '4'
+  loadDrugBatches()
 }
 
 const showPrescriptionManagement = () => {
@@ -727,10 +963,35 @@ const submitForm = async () => {
   }
 }
 
+// 药品管理相关方法
+const loadDrugBatches = async () => {
+  drugLoading.value = true
+  try {
+    const params = {
+      current: drugPagination.current,
+      size: drugPagination.size
+    }
+    if (drugSearchKeyword.value) {
+      params.keyword = drugSearchKeyword.value
+    }
+    
+    const response = await getDrugBatches(params)
+    drugList.value = response.data.records || []
+    drugPagination.total = response.data.total || 0
+  } catch (error) {
+    console.error('加载药品列表失败:', error)
+    ElMessage.error('加载药品列表失败')
+  } finally {
+    drugLoading.value = false
+  }
+}
+
 // 页面加载时获取科室列表
 onMounted(() => {
   if (currentMenu.value === '6') {
     loadDepartments()
+  } else if (currentMenu.value === '4') {
+    loadDrugBatches()
   }
 })
 
@@ -823,6 +1084,196 @@ const submitDoctorForm = async () => {
     ElMessage.success('新增成功')
   }
   doctorDialogVisible.value = false
+}
+
+// 药品管理相关数据
+const drugList = ref([])
+const drugLoading = ref(false)
+const drugSearchKeyword = ref('')
+const drugPagination = reactive({ current: 1, size: 10, total: 0 })
+const drugSelection = ref([])
+const drugDialogVisible = ref(false)
+const isDrugEdit = ref(false)
+const drugFormRef = ref()
+const drugForm = reactive({
+  id: null,
+  batchNumber: '',
+  drugName: '',
+  category: '',
+  specification: '',
+  manufacturer: '',
+  expiryDate: '',
+  unitPrice: null,
+  stockQuantity: null
+})
+const drugRules = {
+  batchNumber: [{ required: true, message: '请输入批次号', trigger: 'blur' }],
+  drugName: [{ required: true, message: '请输入药品名称', trigger: 'blur' }],
+  category: [{ required: true, message: '请输入类别', trigger: 'blur' }],
+  specification: [{ required: true, message: '请输入规格', trigger: 'blur' }],
+  manufacturer: [{ required: true, message: '请输入生产厂家', trigger: 'blur' }],
+  expiryDate: [{ required: true, message: '请选择有效期', trigger: 'change' }],
+  unitPrice: [{ required: true, message: '请输入单价', trigger: 'blur' }],
+  stockQuantity: [{ required: true, message: '请输入库存', trigger: 'blur' }],
+}
+
+// 药品入库相关
+const drugInboundDialogVisible = ref(false)
+const drugInboundFormRef = ref()
+const drugInboundForm = reactive({
+  drugName: '',
+  quantity: null,
+  category: '',
+  unitPrice: null,
+  specification: '',
+  manufacturer: '',
+  expiry_date: '',
+  operatorNumber: 'P001',
+  operatorName: '张药师'
+})
+const drugInboundRules = {
+  drugName: [{ required: true, message: '请输入药品名称', trigger: 'blur' }],
+  quantity: [{ required: true, message: '请输入数量', trigger: 'blur' }],
+  category: [{ required: true, message: '请输入类别', trigger: 'blur' }],
+  unitPrice: [{ required: true, message: '请输入单价', trigger: 'blur' }],
+  specification: [{ required: true, message: '请输入规格', trigger: 'blur' }],
+  manufacturer: [{ required: true, message: '请输入生产厂家', trigger: 'blur' }],
+  expiry_date: [{ required: true, message: '请选择有效期', trigger: 'change' }],
+}
+
+// 药品出库相关
+const drugOutboundDialogVisible = ref(false)
+const drugOutboundFormRef = ref()
+const drugOutboundForm = reactive({
+  drugBatchId: null,
+  quantity: null,
+  outboundSource: 'PRESCRIPTION',
+  outboundReason: 'PRESCRIPTION',
+  operatorNumber: 'P001',
+  operatorName: '张药师'
+})
+const drugOutboundRules = {
+  drugBatchId: [{ required: true, message: '请选择药品批次', trigger: 'change' }],
+  quantity: [{ required: true, message: '请输入出库数量', trigger: 'blur' }],
+  outboundReason: [{ required: true, message: '请选择出库原因', trigger: 'change' }],
+}
+
+// 药品管理方法
+const showAddDrugDialog = () => {
+  isDrugEdit.value = false
+  Object.assign(drugForm, { id: null, batchNumber: '', drugName: '', category: '', specification: '', manufacturer: '', expiryDate: '', unitPrice: null, stockQuantity: null })
+  drugDialogVisible.value = true
+}
+const handleDrugEdit = (row) => {
+  isDrugEdit.value = true
+  Object.assign(drugForm, row)
+  drugDialogVisible.value = true
+}
+const handleDrugDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除药品"${row.drugName}"吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+    
+    await deleteDrugBatch(row.id)
+    ElMessage.success('删除成功')
+    loadDrugBatches()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('删除药品失败:', error)
+      ElMessage.error('删除药品失败')
+    }
+  }
+}
+const handleDrugSelectionChange = (selection) => {
+  drugSelection.value = selection
+}
+const handleDrugSearch = () => {
+  drugPagination.current = 1
+  loadDrugBatches()
+}
+const resetDrugSearch = () => {
+  drugSearchKeyword.value = ''
+  drugPagination.current = 1
+  loadDrugBatches()
+}
+const handleDrugSizeChange = (size) => {
+  drugPagination.size = size
+  drugPagination.current = 1
+  loadDrugBatches()
+}
+const handleDrugCurrentChange = (current) => {
+  drugPagination.current = current
+  loadDrugBatches()
+}
+const submitDrugForm = async () => {
+  if (!drugFormRef.value) return
+  
+  try {
+    await drugFormRef.value.validate()
+    
+    if (isDrugEdit.value) {
+      await updateDrugBatch(drugForm.id, drugForm)
+      ElMessage.success('编辑成功')
+    } else {
+      await createDrugBatch(drugForm)
+      ElMessage.success('新增成功')
+    }
+    
+    drugDialogVisible.value = false
+    loadDrugBatches()
+  } catch (error) {
+    console.error('提交药品表单失败:', error)
+    ElMessage.error(isDrugEdit.value ? '编辑失败' : '新增失败')
+  }
+}
+
+// 药品入库方法
+const showDrugInboundDialog = () => {
+  Object.assign(drugInboundForm, { drugName: '', quantity: null, category: '', unitPrice: null, specification: '', manufacturer: '', expiry_date: '' })
+  drugInboundDialogVisible.value = true
+}
+const submitDrugInbound = async () => {
+  if (!drugInboundFormRef.value) return
+  
+  try {
+    await drugInboundFormRef.value.validate()
+    
+    await drugInbound(drugInboundForm)
+    ElMessage.success('入库成功')
+    drugInboundDialogVisible.value = false
+    loadDrugBatches()
+  } catch (error) {
+    console.error('药品入库失败:', error)
+    ElMessage.error('药品入库失败')
+  }
+}
+
+// 药品出库方法
+const showDrugOutboundDialog = () => {
+  Object.assign(drugOutboundForm, { drugBatchId: null, quantity: null, outboundReason: 'PRESCRIPTION' })
+  drugOutboundDialogVisible.value = true
+}
+const submitDrugOutbound = async () => {
+  if (!drugOutboundFormRef.value) return
+  
+  try {
+    await drugOutboundFormRef.value.validate()
+    
+    await drugOutbound(drugOutboundForm)
+    ElMessage.success('出库成功')
+    drugOutboundDialogVisible.value = false
+    loadDrugBatches()
+  } catch (error) {
+    console.error('药品出库失败:', error)
+    ElMessage.error('药品出库失败')
+  }
 }
 </script>
 
@@ -1042,6 +1493,49 @@ const submitDoctorForm = async () => {
 }
 
 .department-management .el-button--small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* 药品管理页面样式 */
+.drug-management {
+  min-height: 100%;
+}
+
+.drug-management .header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.drug-management .low-stock {
+  color: #f56c6c;
+  font-weight: bold;
+}
+
+/* 表格样式优化 */
+.drug-management :deep(.el-table) {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.drug-management :deep(.el-table th) {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: #303133;
+}
+
+.drug-management :deep(.el-table td) {
+  padding: 12px 0;
+}
+
+/* 按钮样式优化 */
+.drug-management .el-button {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.drug-management .el-button--small {
   padding: 6px 12px;
   font-size: 12px;
 }

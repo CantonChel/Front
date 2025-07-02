@@ -1,0 +1,425 @@
+{
+	"info": {
+		"_postman_id": "d128e8b0-2552-4aa5-b64d-414e44de66af",
+		"name": "Drug Management API Collection",
+		"description": "药品信息管理系统API接口集合，包含药品批次、入库记录、出库记录管理",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45410349",
+		"_collection_link": "https://hfutdcsys.postman.co/workspace/hospital-manage~09330e65-9e1b-494c-8998-8d7c52166e3d/collection/35994124-d128e8b0-2552-4aa5-b64d-414e44de66af?action=share&source=collection_link&creator=45410349"
+	},
+	"item": [
+		{
+			"name": "Drug Batch API",
+			"item": [
+				{
+					"name": "分页查询药品批次列表",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drug-batches?current=1&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drug-batches"
+							],
+							"query": [
+								{
+									"key": "current",
+									"value": "1",
+									"description": "当前页码"
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "每页大小"
+								},
+								{
+									"key": "keyword",
+									"value": "阿莫西林",
+									"description": "搜索关键字",
+									"disabled": true
+								}
+							]
+						},
+						"description": "分页查询药品批次列表，支持关键字搜索"
+					},
+					"response": []
+				},
+				{
+					"name": "根据ID查询药品批次详情",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/drug-batches/{{drugBatchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drug-batches",
+								"{{drugBatchId}}"
+							]
+						},
+						"description": "根据药品批次ID查询详细信息"
+					},
+					"response": []
+				},
+				{
+					"name": "新增药品批次",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"batchNumber\": \"BATCH20240001\",\n    \"drugName\": \"阿莫西林胶囊\",\n    \"category\": \"抗生素\",\n    \"specification\": \"0.25g*24粒\",\n    \"manufacturer\": \"华北制药\",\n    \"expiryDate\": \"2025-12-31\",\n    \"unitPrice\": 15.80,\n    \"stockQuantity\": 200\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/drug-batches",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drug-batches"
+							]
+						},
+						"description": "新增药品批次信息"
+					},
+					"response": []
+				},
+				{
+					"name": "更新药品批次",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "            {\n                \"batchNumber\": \"BATCH20240002\",\n                \"drugName\": \"布洛芬片\",\n                \"category\": \"解热镇痛\",\n                \"specification\": \"0.2g*20片\",\n                \"manufacturer\": \"中美史克\",\n                \"expiryDate\": \"2025-06-30\",\n                \"unitPrice\": 8.5,\n                \"stockQuantity\": 147\n            }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/drug-batches/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drug-batches",
+								"2"
+							]
+						},
+						"description": "新增药品批次信息"
+					},
+					"response": []
+				},
+				{
+					"name": "获取即将过期的药品批次",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/drug-batches/expiring?days=30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drug-batches",
+								"expiring"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "30",
+									"description": "天数阈值"
+								}
+							]
+						},
+						"description": "获取指定天数内即将过期的药品批次"
+					},
+					"response": []
+				},
+				{
+					"name": "获取库存不足的药品批次",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/drug-batches/low-stock?threshold=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drug-batches",
+								"low-stock"
+							],
+							"query": [
+								{
+									"key": "threshold",
+									"value": "10",
+									"description": "库存阈值"
+								}
+							]
+						},
+						"description": "获取库存低于阈值的药品批次"
+					},
+					"response": []
+				}
+			],
+			"description": "药品批次管理相关接口"
+		},
+		{
+			"name": "Inbound Record API",
+			"item": [
+				{
+					"name": "分页查询入库记录列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/inbound-records?current=1&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"inbound-records"
+							],
+							"query": [
+								{
+									"key": "current",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "分页查询入库记录列表"
+					},
+					"response": []
+				},
+				{
+					"name": "药品入库（创建批次和入库记录）",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"drugName\": \"阿莫西林胶囊\",\n    \"quantity\": 200,\n    \"category\":\"抗生素\",\n    \"unitPrice\": 15.80,\n    \"specification\":\"0.25g*24粒\",\n    \"manufacturer\":\"齐鲁制药\",\n    \"expiry_date\":\"2025-06-30 00:00:00\",\n    \"operatorNumber\": \"P001\",\n    \"operatorName\": \"张药师\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/inbound-records/inbound",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"inbound-records",
+								"inbound"
+							]
+						},
+						"description": "药品入库操作，自动创建药品批次和入库记录"
+					},
+					"response": []
+				},
+				{
+					"name": "根据药品批次ID查询入库记录",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/inbound-records/batch/{{drugBatchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"inbound-records",
+								"batch",
+								"{{drugBatchId}}"
+							]
+						},
+						"description": "根据药品批次ID查询相关入库记录"
+					},
+					"response": []
+				},
+				{
+					"name": "根据入库单号查询入库记录",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/inbound-records/number/{{inboundNumber}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"inbound-records",
+								"number",
+								"{{inboundNumber}}"
+							]
+						},
+						"description": "根据入库单号查询入库记录"
+					},
+					"response": []
+				}
+			],
+			"description": "入库记录管理相关接口"
+		},
+		{
+			"name": "Outbound Record API",
+			"item": [
+				{
+					"name": "分页查询出库记录列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outbound-records?current=1&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"outbound-records"
+							],
+							"query": [
+								{
+									"key": "current",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "分页查询出库记录列表"
+					},
+					"response": []
+				},
+				{
+					"name": "药品出库",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"drugBatchId\": 1,\n    \"quantity\": 5,\n    \"outboundSource\": \"PRESCRIPTION\",\n    \"outboundReason\": \"PRESCRIPTION\",\n    \"operatorNumber\": \"P001\",\n    \"operatorName\": \"张药师\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/outbound-records/outbound",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"outbound-records",
+								"outbound"
+							]
+						},
+						"description": "药品出库操作，自动更新库存并创建出库记录"
+					},
+					"response": []
+				},
+				{
+					"name": "根据药品批次ID查询出库记录",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outbound-records/batch/{{drugBatchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"outbound-records",
+								"batch",
+								"{{drugBatchId}}"
+							]
+						},
+						"description": "根据药品批次ID查询相关出库记录"
+					},
+					"response": []
+				},
+				{
+					"name": "根据出库单号查询出库记录",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outbound-records/number/{{outboundNumber}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"outbound-records",
+								"number",
+								"{{outboundNumber}}"
+							]
+						},
+						"description": "根据出库单号查询出库记录"
+					},
+					"response": []
+				}
+			],
+			"description": "出库记录管理相关接口"
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "drugBatchId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "inboundNumber",
+			"value": "IN20240001",
+			"type": "string"
+		},
+		{
+			"key": "outboundNumber",
+			"value": "OUT20240001",
+			"type": "string"
+		}
+	]
+}

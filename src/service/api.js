@@ -298,4 +298,127 @@ export async function getAllDoctors() {
     url: '/api/doctors/all',
     method: 'get'
   })
+}
+
+/**
+ * 药品管理相关API
+ */
+
+/**
+ * 分页查询药品批次列表
+ * @param {Object} params
+ * @param {number} params.current - 当前页码
+ * @param {number} params.size - 每页大小
+ * @param {string} params.keyword - 搜索关键字
+ * @returns {Promise}
+ */
+export async function getDrugBatches(params) {
+  return await request({
+    url: '/api/drug-batches',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 根据ID查询药品批次详情
+ * @param {number} id - 药品批次ID
+ * @returns {Promise}
+ */
+export async function getDrugBatchById(id) {
+  return await request({
+    url: `/api/drug-batches/${id}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 新增药品批次
+ * @param {Object} data - 药品批次信息
+ * @returns {Promise}
+ */
+export async function createDrugBatch(data) {
+  return await request({
+    url: '/api/drug-batches',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新药品批次
+ * @param {number} id - 药品批次ID
+ * @param {Object} data - 药品批次信息
+ * @returns {Promise}
+ */
+export async function updateDrugBatch(id, data) {
+  return await request({
+    url: `/api/drug-batches/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 删除药品批次
+ * @param {number} id - 药品批次ID
+ * @returns {Promise}
+ */
+export async function deleteDrugBatch(id) {
+  return await request({
+    url: `/api/drug-batches/${id}`,
+    method: 'delete'
+  })
+}
+
+/**
+ * 获取即将过期的药品批次
+ * @param {number} days - 天数阈值
+ * @returns {Promise}
+ */
+export async function getExpiringDrugBatches(days = 30) {
+  return await request({
+    url: '/api/drug-batches/expiring',
+    method: 'get',
+    params: { days }
+  })
+}
+
+/**
+ * 获取库存不足的药品批次
+ * @param {number} threshold - 库存阈值
+ * @returns {Promise}
+ */
+export async function getLowStockDrugBatches(threshold = 10) {
+  return await request({
+    url: '/api/drug-batches/low-stock',
+    method: 'get',
+    params: { threshold }
+  })
+}
+
+/**
+ * 药品入库
+ * @param {Object} data - 入库信息
+ * @returns {Promise}
+ */
+export async function drugInbound(data) {
+  return await request({
+    url: '/api/inbound-records/inbound',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 药品出库
+ * @param {Object} data - 出库信息
+ * @returns {Promise}
+ */
+export async function drugOutbound(data) {
+  return await request({
+    url: '/api/outbound-records/outbound',
+    method: 'post',
+    data
+  })
 } 
