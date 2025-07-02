@@ -186,4 +186,116 @@ export async function getAllDepartments() {
     url: '/api/departments/all',
     method: 'get'
   })
+}
+
+/**
+ * 医生管理相关API
+ */
+
+/**
+ * 分页查询医生列表
+ * @param {Object} params
+ * @param {number} params.current - 当前页码
+ * @param {number} params.size - 每页大小
+ * @param {string} params.keyword - 搜索关键字
+ * @returns {Promise}
+ */
+export async function getDoctors(params) {
+  return await request({
+    url: '/api/doctors',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 根据ID查询医生详情
+ * @param {number} id - 医生ID
+ * @returns {Promise}
+ */
+export async function getDoctorById(id) {
+  return await request({
+    url: `/api/doctors/${id}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 新增医生
+ * @param {Object} data - 医生信息
+ * @returns {Promise}
+ */
+export async function createDoctor(data) {
+  return await request({
+    url: '/api/doctors',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新医生信息
+ * @param {number} id - 医生ID
+ * @param {Object} data - 医生信息
+ * @returns {Promise}
+ */
+export async function updateDoctor(id, data) {
+  return await request({
+    url: `/api/doctors/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 删除医生
+ * @param {number} id - 医生ID
+ * @returns {Promise}
+ */
+export async function deleteDoctor(id) {
+  return await request({
+    url: `/api/doctors/${id}`,
+    method: 'delete'
+  })
+}
+
+/**
+ * 根据工号查询医生
+ * @param {string} employeeNumber - 工号
+ * @returns {Promise}
+ */
+export async function getDoctorByEmployeeNumber(employeeNumber) {
+  return await request({
+    url: `/api/doctors/employee/${employeeNumber}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 检查工号是否已存在
+ * @param {string} employeeNumber - 工号
+ * @param {number} excludeId - 排除的医生ID
+ * @returns {Promise}
+ */
+export async function checkEmployeeNumber(employeeNumber, excludeId = null) {
+  const params = { employeeNumber }
+  if (excludeId) {
+    params.excludeId = excludeId
+  }
+  return await request({
+    url: '/api/doctors/check-employee-number',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取所有医生列表（不分页）
+ * @returns {Promise}
+ */
+export async function getAllDoctors() {
+  return await request({
+    url: '/api/doctors/all',
+    method: 'get'
+  })
 } 
