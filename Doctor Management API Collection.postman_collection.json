@@ -1,0 +1,448 @@
+{
+	"info": {
+		"_postman_id": "d98ee6f2-3b96-403d-b8fd-28722fccca16",
+		"name": "Doctor Management API Collection",
+		"description": "医生管理系统API接口集合",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45410349",
+		"_collection_link": "https://hfutdcsys.postman.co/workspace/hospital-manage~09330e65-9e1b-494c-8998-8d7c52166e3d/collection/35994124-d98ee6f2-3b96-403d-b8fd-28722fccca16?action=share&source=collection_link&creator=45410349"
+	},
+	"item": [
+		{
+			"name": "分页查询医生列表",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors?current=1&size=10",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors"
+					],
+					"query": [
+						{
+							"key": "current",
+							"value": "1",
+							"description": "当前页码"
+						},
+						{
+							"key": "size",
+							"value": "10",
+							"description": "每页大小"
+						},
+						{
+							"key": "keyword",
+							"value": "张三",
+							"description": "搜索关键字",
+							"disabled": true
+						}
+					]
+				},
+				"description": "分页查询医生列表，支持关键字搜索"
+			},
+			"response": []
+		},
+		{
+			"name": "根据ID查询医生详情",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/{{doctorId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"{{doctorId}}"
+					]
+				},
+				"description": "根据医生ID查询医生详细信息"
+			},
+			"response": []
+		},
+		{
+			"name": "新增医生",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"employeeNumber\": \"D017\",\n    \"name\": \"张医生\",\n    \"gender\": \"MALE\",\n    \"age\": 35,\n    \"departmentId\": 1001,\n    \"departmentName\": \"内科\",\n    \"jobTitle\": \"ATTENDING_PHYSICIAN\",\n    \"phone\": \"13800138001\",\n    \"hireDate\": \"2023-01-01\",\n    \"workStatus\": \"ACTIVE\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors"
+					]
+				},
+				"description": "新增医生信息"
+			},
+			"response": []
+		},
+		{
+			"name": "更新医生信息",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"employeeNumber\": \"D001\",\n    \"name\": \"张主任\",\n    \"gender\": \"MALE\",\n    \"age\": 36,\n    \"departmentId\": 1,\n    \"departmentName\": \"内科\",\n    \"jobTitle\": \"CHIEF_PHYSICIAN\",\n    \"phone\": \"13800138001\",\n    \"hireDate\": \"2023-01-01\",\n    \"workStatus\": \"ACTIVE\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/{{doctorId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"{{doctorId}}"
+					]
+				},
+				"description": "更新医生信息"
+			},
+			"response": []
+		},
+		{
+			"name": "删除医生",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/{{doctorId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"{{doctorId}}"
+					]
+				},
+				"description": "删除医生（需确保不是任何科室的负责人）"
+			},
+			"response": []
+		},
+		{
+			"name": "批量删除医生",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[1, 2, 3]"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors"
+					]
+				},
+				"description": "批量删除医生"
+			},
+			"response": []
+		},
+		{
+			"name": "根据工号查询医生",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/employee/{{employeeNumber}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"employee",
+						"{{employeeNumber}}"
+					]
+				},
+				"description": "根据工号查询医生信息"
+			},
+			"response": []
+		},
+		{
+			"name": "检查工号是否已存在",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/check-employee-number?employeeNumber=D001",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"check-employee-number"
+					],
+					"query": [
+						{
+							"key": "employeeNumber",
+							"value": "D001",
+							"description": "工号"
+						},
+						{
+							"key": "excludeId",
+							"value": "1",
+							"description": "排除的医生ID",
+							"disabled": true
+						}
+					]
+				},
+				"description": "检查工号是否已存在，可排除指定ID"
+			},
+			"response": []
+		},
+		{
+			"name": "根据科室ID查询医生列表",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/department/{{departmentId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"department",
+						"{{departmentId}}"
+					]
+				},
+				"description": "根据科室ID查询该科室所有医生"
+			},
+			"response": []
+		},
+		{
+			"name": "医生调科",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/{{doctorId}}/transfer?departmentId={{newDepartmentId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"{{doctorId}}",
+						"transfer"
+					],
+					"query": [
+						{
+							"key": "departmentId",
+							"value": "{{newDepartmentId}}",
+							"description": "新科室ID"
+						}
+					]
+				},
+				"description": "调整医生所属科室"
+			},
+			"response": []
+		},
+		{
+			"name": "获取所有医生列表（不分页）",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/all",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"all"
+					]
+				},
+				"description": "获取所有医生列表，不分页"
+			},
+			"response": []
+		},
+		{
+			"name": "根据职称查询医生列表",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/title/{{jobTitle}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"title",
+						"{{jobTitle}}"
+					]
+				},
+				"description": "根据职称查询医生列表"
+			},
+			"response": []
+		},
+		{
+			"name": "根据工作状态查询医生列表",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/doctors/status/{{workStatus}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"doctors",
+						"status",
+						"{{workStatus}}"
+					]
+				},
+				"description": "根据工作状态查询医生列表"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://116.62.209.93:18081",
+			"type": "string"
+		},
+		{
+			"key": "doctorId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "employeeNumber",
+			"value": "D001",
+			"type": "string"
+		},
+		{
+			"key": "departmentId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "newDepartmentId",
+			"value": "2",
+			"type": "string"
+		},
+		{
+			"key": "jobTitle",
+			"value": "ATTENDING_PHYSICIAN",
+			"type": "string"
+		},
+		{
+			"key": "workStatus",
+			"value": "ACTIVE",
+			"type": "string"
+		}
+	]
+}

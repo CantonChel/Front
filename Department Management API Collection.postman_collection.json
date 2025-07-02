@@ -1,0 +1,358 @@
+{
+	"info": {
+		"_postman_id": "c4a06c64-6ea8-4e3f-9614-c9edec68c151",
+		"name": "Department Management API Collection",
+		"description": "科室管理系统API接口集合",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45410349",
+		"_collection_link": "https://hfutdcsys.postman.co/workspace/hospital-manage~09330e65-9e1b-494c-8998-8d7c52166e3d/collection/35994124-c4a06c64-6ea8-4e3f-9614-c9edec68c151?action=share&source=collection_link&creator=45410349"
+	},
+	"item": [
+		{
+			"name": "分页查询科室列表",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/departments?current=1&size=10",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments"
+					],
+					"query": [
+						{
+							"key": "current",
+							"value": "1",
+							"description": "当前页码"
+						},
+						{
+							"key": "size",
+							"value": "10",
+							"description": "每页大小"
+						},
+						{
+							"key": "keyword",
+							"value": "内科",
+							"description": "搜索关键字",
+							"disabled": true
+						}
+					]
+				},
+				"description": "分页查询科室列表，支持关键字搜索"
+			},
+			"response": []
+		},
+		{
+			"name": "根据ID查询科室详情",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/departments/{{departmentId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments",
+						"{{departmentId}}"
+					]
+				},
+				"description": "根据科室ID查询科室详细信息"
+			},
+			"response": []
+		},
+		{
+			"name": "新增科室",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"departmentCode\": \"DEPT001\",\n    \"departmentName\": \"内科\",\n    \"managerId\": null,\n    \"managerName\": null,\n    \"bedCount\": 50,\n    \"phone\": \"0551-12345678\",\n    \"description\": \"负责内科疾病的诊断和治疗\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/departments",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments"
+					]
+				},
+				"description": "新增科室信息"
+			},
+			"response": []
+		},
+		{
+			"name": "新增科室并设置负责人",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"departmentCode\": \"DEPT002\",\n    \"departmentName\": \"外科\",\n    \"bedCount\": 40,\n    \"phone\": \"0551-87654321\",\n    \"description\": \"负责外科手术和治疗\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/departments/with-manager?managerId={{managerId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments",
+						"with-manager"
+					],
+					"query": [
+						{
+							"key": "managerId",
+							"value": "{{managerId}}",
+							"description": "负责人医生ID"
+						}
+					]
+				},
+				"description": "新增科室并自动设置负责人"
+			},
+			"response": []
+		},
+		{
+			"name": "更新科室信息",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"departmentCode\": \"DEPT001\",\n    \"departmentName\": \"内科门诊\",\n    \"managerId\": 1,\n    \"managerName\": \"张主任\",\n    \"bedCount\": 60,\n    \"phone\": \"0551-12345678\",\n    \"description\": \"负责内科疾病的诊断、治疗和门诊服务\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/departments/{{departmentId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments",
+						"{{departmentId}}"
+					]
+				},
+				"description": "更新科室信息"
+			},
+			"response": []
+		},
+		{
+			"name": "删除科室",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/departments/{{departmentId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments",
+						"{{departmentId}}"
+					]
+				},
+				"description": "删除科室（需确保没有关联的医生）"
+			},
+			"response": []
+		},
+		{
+			"name": "批量删除科室",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[1, 2, 3]"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/departments",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments"
+					]
+				},
+				"description": "批量删除科室"
+			},
+			"response": []
+		},
+		{
+			"name": "根据科室编号查询科室",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/departments/code/{{departmentCode}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments",
+						"code",
+						"{{departmentCode}}"
+					]
+				},
+				"description": "根据科室编号查询科室信息"
+			},
+			"response": []
+		},
+		{
+			"name": "检查科室编号是否已存在",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/departments/check-code?departmentCode=DEPT001",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments",
+						"check-code"
+					],
+					"query": [
+						{
+							"key": "departmentCode",
+							"value": "DEPT001",
+							"description": "科室编号"
+						},
+						{
+							"key": "excludeId",
+							"value": "1",
+							"description": "排除的科室ID",
+							"disabled": true
+						}
+					]
+				},
+				"description": "检查科室编号是否已存在，可排除指定ID"
+			},
+			"response": []
+		},
+		{
+			"name": "获取所有科室列表（不分页）",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/departments/all",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"departments",
+						"all"
+					]
+				},
+				"description": "获取所有科室列表，不分页"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://116.62.209.93:18081",
+			"type": "string"
+		},
+		{
+			"key": "departmentId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "departmentCode",
+			"value": "DEPT001",
+			"type": "string"
+		},
+		{
+			"key": "managerId",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}

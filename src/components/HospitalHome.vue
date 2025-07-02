@@ -70,6 +70,15 @@
                 </template>
               </el-menu-item>
             </el-tooltip>
+
+            <el-tooltip content="科室管理" placement="right" effect="light">
+              <el-menu-item index="6" @click="showDepartmentManagement">
+                <el-icon><OfficeBuilding /></el-icon>
+                <template #title>
+                  <span>科室管理</span>
+                </template>
+              </el-menu-item>
+            </el-tooltip>
           </template>
 
           <template v-if="userStore.isNurse">
@@ -87,6 +96,15 @@
                 <el-icon><Box /></el-icon>
                 <template #title>
                   <span>药品管理</span>
+                </template>
+              </el-menu-item>
+            </el-tooltip>
+
+            <el-tooltip content="科室管理" placement="right" effect="light">
+              <el-menu-item index="6" @click="showDepartmentManagement">
+                <el-icon><OfficeBuilding /></el-icon>
+                <template #title>
+                  <span>科室管理</span>
                 </template>
               </el-menu-item>
             </el-tooltip>
@@ -110,6 +128,15 @@
                 </template>
               </el-menu-item>
             </el-tooltip>
+
+            <el-tooltip content="科室管理" placement="right" effect="light">
+              <el-menu-item index="6" @click="showDepartmentManagement">
+                <el-icon><OfficeBuilding /></el-icon>
+                <template #title>
+                  <span>科室管理</span>
+                </template>
+              </el-menu-item>
+            </el-tooltip>
           </template>
         </el-menu>
       </el-aside>
@@ -118,8 +145,74 @@
       <el-main class="main-content">
         <transition name="fade" mode="out-in">
           <div class="content-wrapper" :key="currentMenu">
-            <!-- 占位内容 -->
-            <div class="placeholder-content">
+            <!-- 科室管理页面 -->
+            <div v-if="currentMenu === '6'" class="department-management">
+              <div class="page-header">
+                <h2 class="page-title">科室管理</h2>
+                <el-button type="primary" @click="showAddDepartmentDialog">
+                  <el-icon><Plus /></el-icon>新增科室
+                </el-button>
+              </div>
+
+              <!-- 搜索栏 -->
+              <div class="search-bar">
+                <el-input
+                  v-model="searchKeyword"
+                  placeholder="请输入科室名称或编号搜索"
+                  style="width: 300px"
+                  clearable
+                  @keyup.enter="handleSearch"
+                >
+                  <template #prefix>
+                    <el-icon><Search /></el-icon>
+                  </template>
+                </el-input>
+                <el-button type="primary" @click="handleSearch">搜索</el-button>
+                <el-button @click="resetSearch">重置</el-button>
+              </div>
+
+              <!-- 科室列表 -->
+              <el-table
+                :data="departmentList"
+                v-loading="loading"
+                style="width: 100%"
+                @selection-change="handleSelectionChange"
+              >
+                <el-table-column type="selection" width="55" />
+                <el-table-column prop="departmentCode" label="科室编号" width="120" />
+                <el-table-column prop="departmentName" label="科室名称" width="150" />
+                <el-table-column prop="managerName" label="负责人" width="120" />
+                <el-table-column prop="bedCount" label="床位数" width="100" />
+                <el-table-column prop="phone" label="联系电话" width="150" />
+                <el-table-column prop="description" label="描述" show-overflow-tooltip />
+                <el-table-column label="操作" width="200" fixed="right">
+                  <template #default="scope">
+                    <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button
+                      size="small"
+                      type="danger"
+                      @click="handleDelete(scope.row)"
+                    >删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+
+              <!-- 分页 -->
+              <div class="pagination-wrapper">
+                <el-pagination
+                  v-model:current-page="pagination.current"
+                  v-model:page-size="pagination.size"
+                  :page-sizes="[10, 20, 50, 100]"
+                  :total="pagination.total"
+                  layout="total, sizes, prev, pager, next, jumper"
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                />
+              </div>
+            </div>
+
+            <!-- 其他功能占位内容 -->
+            <div v-else class="placeholder-content">
               <el-empty 
                 :description="`${getMenuTitle(currentMenu)}功能开发中...`"
                 :image-size="150"
@@ -131,11 +224,77 @@
         </transition>
       </el-main>
     </div>
+
+    <!-- 新增/编辑科室对话框 -->
+    <el-dialog
+      v-model="departmentDialogVisible"
+      :title="isEdit ? '编辑科室' : '新增科室'"
+      width="600px"
+      @close="resetForm"
+    >
+      <el-form
+        ref="departmentFormRef"
+        :model="departmentForm"
+        :rules="departmentRules"
+        label-width="100px"
+      >
+        <el-form-item label="科室编号" prop="departmentCode">
+          <el-input
+            v-model="departmentForm.departmentCode"
+            placeholder="请输入科室编号"
+            :disabled="isEdit"
+          />
+        </el-form-item>
+        <el-form-item label="科室名称" prop="departmentName">
+          <el-input
+            v-model="departmentForm.departmentName"
+            placeholder="请输入科室名称"
+          />
+        </el-form-item>
+        <el-form-item label="负责人" prop="managerName">
+          <el-input
+            v-model="departmentForm.managerName"
+            placeholder="请输入负责人姓名"
+          />
+        </el-form-item>
+        <el-form-item label="床位数" prop="bedCount">
+          <el-input-number
+            v-model="departmentForm.bedCount"
+            :min="0"
+            :max="999"
+            placeholder="请输入床位数"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="联系电话" prop="phone">
+          <el-input
+            v-model="departmentForm.phone"
+            placeholder="请输入联系电话"
+          />
+        </el-form-item>
+        <el-form-item label="描述" prop="description">
+          <el-input
+            v-model="departmentForm.description"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入科室描述"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="departmentDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitForm" :loading="submitLoading">
+            {{ isEdit ? '更新' : '创建' }}
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -148,14 +307,74 @@ import {
   Notebook,
   Box,
   Document,
+  OfficeBuilding,
+  Plus,
+  Search,
 } from '@element-plus/icons-vue'
 import { useUserStore } from '../stores/user'
+import {
+  getDepartments,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+  checkDepartmentCode
+} from '../service/api'
 
 const router = useRouter()
 const userStore = useUserStore()
 
 // 响应式数据
-const currentMenu = ref('1')
+const currentMenu = ref('6') // 默认显示科室管理
+
+// 科室管理相关数据
+const loading = ref(false)
+const departmentList = ref([])
+const searchKeyword = ref('')
+const selectedDepartments = ref([])
+
+// 分页数据
+const pagination = reactive({
+  current: 1,
+  size: 10,
+  total: 0
+})
+
+// 对话框相关
+const departmentDialogVisible = ref(false)
+const isEdit = ref(false)
+const submitLoading = ref(false)
+const departmentFormRef = ref()
+
+// 表单数据
+const departmentForm = reactive({
+  id: null,
+  departmentCode: '',
+  departmentName: '',
+  managerId: null,
+  managerName: '',
+  bedCount: 0,
+  phone: '',
+  description: ''
+})
+
+// 表单验证规则
+const departmentRules = {
+  departmentCode: [
+    { required: true, message: '请输入科室编号', trigger: 'blur' },
+    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+  ],
+  departmentName: [
+    { required: true, message: '请输入科室名称', trigger: 'blur' },
+    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+  ],
+  bedCount: [
+    { required: true, message: '请输入床位数', trigger: 'blur' },
+    { type: 'number', min: 0, message: '床位数不能小于0', trigger: 'blur' }
+  ],
+  phone: [
+    { pattern: /^1[3-9]\d{9}$|^0\d{2,3}-?\d{7,8}$/, message: '请输入正确的电话号码', trigger: 'blur' }
+  ]
+}
 
 // 用户信息计算属性
 const userInitial = computed(() => userStore.name ? userStore.name.charAt(0) : 'U')
@@ -167,7 +386,8 @@ const menuTitleMap = {
   '2': '患者开药',
   '3': '人事管理',
   '4': '药品管理',
-  '5': '处方管理'
+  '5': '处方管理',
+  '6': '科室管理'
 }
 
 // 获取菜单标题
@@ -232,6 +452,140 @@ const showDrugManagement = () => {
 const showPrescriptionManagement = () => {
   currentMenu.value = '5'
 }
+
+const showDepartmentManagement = () => {
+  currentMenu.value = '6'
+  loadDepartments()
+}
+
+// 科室管理相关方法
+const loadDepartments = async () => {
+  loading.value = true
+  try {
+    const params = {
+      current: pagination.current,
+      size: pagination.size
+    }
+    if (searchKeyword.value) {
+      params.keyword = searchKeyword.value
+    }
+    
+    const response = await getDepartments(params)
+    departmentList.value = response.data.records || []
+    pagination.total = response.data.total || 0
+  } catch (error) {
+    console.error('加载科室列表失败:', error)
+    ElMessage.error('加载科室列表失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleSearch = () => {
+  pagination.current = 1
+  loadDepartments()
+}
+
+const resetSearch = () => {
+  searchKeyword.value = ''
+  pagination.current = 1
+  loadDepartments()
+}
+
+const handleSizeChange = (size) => {
+  pagination.size = size
+  pagination.current = 1
+  loadDepartments()
+}
+
+const handleCurrentChange = (current) => {
+  pagination.current = current
+  loadDepartments()
+}
+
+const handleSelectionChange = (selection) => {
+  selectedDepartments.value = selection
+}
+
+const showAddDepartmentDialog = () => {
+  isEdit.value = false
+  departmentDialogVisible.value = true
+}
+
+const handleEdit = (row) => {
+  isEdit.value = true
+  Object.assign(departmentForm, row)
+  departmentDialogVisible.value = true
+}
+
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除科室"${row.departmentName}"吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+    
+    await deleteDepartment(row.id)
+    ElMessage.success('删除成功')
+    loadDepartments()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('删除科室失败:', error)
+      ElMessage.error('删除科室失败')
+    }
+  }
+}
+
+const resetForm = () => {
+  departmentFormRef.value?.resetFields()
+  Object.assign(departmentForm, {
+    id: null,
+    departmentCode: '',
+    departmentName: '',
+    managerId: null,
+    managerName: '',
+    bedCount: 0,
+    phone: '',
+    description: ''
+  })
+}
+
+const submitForm = async () => {
+  if (!departmentFormRef.value) return
+  
+  try {
+    await departmentFormRef.value.validate()
+    submitLoading.value = true
+    
+    if (isEdit.value) {
+      await updateDepartment(departmentForm.id, departmentForm)
+      ElMessage.success('更新成功')
+    } else {
+      await createDepartment(departmentForm)
+      ElMessage.success('创建成功')
+    }
+    
+    departmentDialogVisible.value = false
+    loadDepartments()
+  } catch (error) {
+    console.error('提交表单失败:', error)
+    ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
+  } finally {
+    submitLoading.value = false
+  }
+}
+
+// 页面加载时获取科室列表
+onMounted(() => {
+  if (currentMenu.value === '6') {
+    loadDepartments()
+  }
+})
 </script>
 
 <style scoped>
@@ -390,6 +744,70 @@ const showPrescriptionManagement = () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+/* 科室管理页面样式 */
+.department-management {
+  min-height: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e4e7ed;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e4e7ed;
+}
+
+/* 表格样式优化 */
+.department-management :deep(.el-table) {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.department-management :deep(.el-table th) {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: #303133;
+}
+
+.department-management :deep(.el-table td) {
+  padding: 12px 0;
+}
+
+/* 按钮样式优化 */
+.department-management .el-button {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.department-management .el-button--small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
 /* 占位内容样式 */
 .placeholder-content {
   display: flex;
@@ -432,6 +850,17 @@ const showPrescriptionManagement = () => {
   .main-content {
     margin-left: 240px;
     padding: 16px;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .search-bar {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style> 
